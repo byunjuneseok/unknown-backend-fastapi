@@ -8,6 +8,11 @@ pynamodb==5.1.0
 # ASGI Server
 uvicorn[standard]==0.15.0
 
+# Celery
+celery==5.1.2
+flower==1.0.0
+redis==3.5.3
+
 # Dependencies
 bcrypt==3.2.0
 elasticsearch==7.15.1

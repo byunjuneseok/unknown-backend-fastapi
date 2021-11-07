@@ -13,5 +13,5 @@ COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
 # Copy `app/`
-ADD ./app ./app
+ADD . ./app
 CMD bash -c "uvicorn app.main:app --host 0.0.0.0 --port 3000"

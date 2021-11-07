@@ -1,0 +1,5 @@
+- pipeline.id: init-table-pipeline
+  path.config: "/usr/share/logstash/pipeline/init_table.conf"
+
+- pipeline.id: sync-table-pipeline
+  path.config: "/usr/share/logstash/pipeline/sync_table.conf"

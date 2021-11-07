@@ -1,22 +1,147 @@
 # docker-compose is used only for development.
 version: "3"
 
-volumes:
-  pg_data: {}
-
 services:
+  mysql:
+    build:
+      context: mysql/
+      args:
+        MYSQL_VERSION: 8.0
+    volumes:
+      - type: bind
+        source: ./mysql/config/mysql.cnf
+        target: /etc/mysql/conf.d/my.cnf
+        read_only: true
+      - type: bind
+        source: ./mysql/sql
+        target: /docker-entrypoint-initdb.d
+        read_only: true
+      - type: volume
+        source: mysql
+        target: /var/lib/mysql
+    ports:
+      - "33306:3306"
+    env_file: database.env
+
+  elasticsearch:
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: 7.13.0
+    volumes:
+      - type: bind
+        source: ./elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    env_file: elk.env
+
+  logstash:
+    build:
+      context: logstash/
+      args:
+        ELK_VERSION: 7.13.0
+    volumes:
+      - type: bind
+        source: ./logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline/pipelines.yml
+        target: /usr/share/logstash/config/pipelines.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline/conf
+        target: /usr/share/logstash/pipeline
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline/sql
+        target: /usr/share/logstash/sql
+        read_only: true
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    env_file: elk.env
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    build:
+      context: kibana/
+      args:
+        ELK_VERSION: 7.13.0
+    volumes:
+      - type: bind
+        source: ./kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
   web:
     platform: linux/amd64
     build:
-      context: .
+      context: ./app
     volumes:
       - .:/app
     ports:
       - 3000:3000
-      - 8000:8000
-    expose:
-      - "8000"
-    environment:
-      - JWT_SECRET='A95DED275E9D6AF78FC8296BCC928DA048DED8B051798E5AD1727EEF337EAECE'
-      - DYNAMODB_RECOMMANDATION_CACHE_TABLE_NAME='...'
+    env_file: .env
     restart: always
+    depends_on:
+      - mysql
+
+  redis:
+    # For development purpose.
+    image: redis:6.2.6
+    command: redis-server --requirepass admin123 --port 6379
+    container_name: redis
+    hostname: redis
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    ports:
+      - 6379:6379
+
+  rabbitmq:
+    image: rabbitmq:latest
+    volumes:
+      - "./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf"
+    ports:
+        - "5672:5672"
+
+  worker:
+    build: ./app
+    command: celery -A app.celery.worker worker -l info
+    volumes:
+      - .:/usr/src/app
+    env_file: .env
+    depends_on:
+      - web
+      - redis
+
+  dashboard:
+    # For Development purpose
+    build: ./app
+    command: celery -A app.celery.worker flower
+    ports:
+      - 5555:5555
+    env_file: .env
+    depends_on:
+      - web
+      - redis
+      - rabbitmq
+      - worker
+
+volumes:
+  mysql:
+  elasticsearch:

@@ -1,6 +1,5 @@
-from typing import Any
 from pydantic import BaseSettings, validator
-from pydantic.networks import AnyUrl
+from pydantic.networks import AnyUrl, RedisDsn
 
 from app.core import const
 
@@ -21,6 +20,16 @@ class Settings(BaseSettings):
     DYNAMODB_RECOMMANDATION_CACHE_TABLE_NAME: str
     DYNAMODB_RECOMMANDATION_CACHE_TABLE_REGION: str = 'ap-northeast-2'
 
+    CELERY_REDIS_HOST: str
+    CELERY_REDIS_PORT: str
+    CELERY_REDIS_DB_INDEX: str
+
+    CELERY_RABBITMQ_HOST: str
+    CELERY_RABBITMQ_PORT: str
+    CELERY_RABBITMQ_USERNAME: str
+    CELERY_RABBITMQ_PASSWORD: str
+
+
     @validator('JWT_SECRET')
     def validate_jwt_secret(cls, value: str):
         if len(value) < 32:
@@ -37,5 +46,12 @@ class Settings(BaseSettings):
             self.MAIN_DATABASE_MYSQL_DATABASE_NAME
         )
 
+    @property
+    def get_celery_broker_uri(self) -> str:
+        return f'amqp://{self.CELERY_RABBITMQ_USERNAME}:{self.CELERY_RABBITMQ_PASSWORD}@{self.CELERY_RABBITMQ_HOST}:{self.CELERY_RABBITMQ_PORT}'
+
+    @property
+    def get_backend_uri(self) -> str:
+        return f'redis://{self.CELERY_REDIS_HOST}:{self.CELERY_REDIS_PORT}/{self.CELERY_REDIS_DB_INDEX}'
 
 settings = Settings()
