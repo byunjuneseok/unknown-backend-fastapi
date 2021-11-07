@@ -1,0 +1,22 @@
+# docker-compose is used only for development.
+version: "3"
+
+volumes:
+  pg_data: {}
+
+services:
+  web:
+    platform: linux/amd64
+    build:
+      context: .
+    volumes:
+      - .:/app
+    ports:
+      - 3000:3000
+      - 8000:8000
+    expose:
+      - "8000"
+    environment:
+      - JWT_SECRET='A95DED275E9D6AF78FC8296BCC928DA048DED8B051798E5AD1727EEF337EAECE'
+      - DYNAMODB_RECOMMANDATION_CACHE_TABLE_NAME='...'
+    restart: always
