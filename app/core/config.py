@@ -17,9 +17,12 @@ class Settings(BaseSettings):
     MAIN_DATABASE_MYSQL_PORT: str = '3306'
     MAIN_DATABASE_MYSQL_DATABASE_NAME: str = 'agd'
 
-    DYNAMODB_RECOMMANDATION_CACHE_TABLE_NAME: str
-    DYNAMODB_RECOMMANDATION_CACHE_TABLE_REGION: str = 'ap-northeast-2'
-
+    DYNAMODB_CURATION_COLLABORATIVE_FILTERING_CACHE_TABLE_NAME: str
+    DYNAMODB_CURATION_COLLABORATIVE_FILTERING_CACHE_REGION: str = 'ap-northeast-2'
+    DYNAMODB_CURATION_CONTENT_BASED_FILTERING_CACHE_TABLE_NAME: str
+    DYNAMODB_CURATION_CONTENT_BASED_FILTERING_CACHE_REGION: str = 'ap-northeast-2'
+    
+    CELERY_REDIS_PASSWORD: str
     CELERY_REDIS_HOST: str
     CELERY_REDIS_PORT: str
     CELERY_REDIS_DB_INDEX: str
@@ -52,6 +55,6 @@ class Settings(BaseSettings):
 
     @property
     def get_backend_uri(self) -> str:
-        return f'redis://{self.CELERY_REDIS_HOST}:{self.CELERY_REDIS_PORT}/{self.CELERY_REDIS_DB_INDEX}'
+        return f'redis://:{self.CELERY_REDIS_PASSWORD}@{self.CELERY_REDIS_HOST}:{self.CELERY_REDIS_PORT}/{self.CELERY_REDIS_DB_INDEX}'
 
 settings = Settings()
