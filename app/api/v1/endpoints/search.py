@@ -21,6 +21,9 @@ async def search_store(query: str, elasticsearch: Elasticsearch = Depends(get_el
         }
     }
     
-    result = elasticsearch.search(index=settings.ELASTICSEARCH_STORE_SEARCH_INDEX, body=body)
+    result = elasticsearch.search(index=settings.ELASTICSEARCH_STORE_SEARCH_INDEX, body=body, size=10000)
+    result = result['hits']['hits']
+    
+    result = [item['_source'] for item in result]
     
     return result
