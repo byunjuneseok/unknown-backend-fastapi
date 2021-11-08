@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     JWT_EXPIRED_IN: int = 12 * 60 * 60  # 12hours
 
     MAIN_DATABASE_MYSQL_USER: str = 'system'
-    MAIN_DATABSAE_MYSQL_PASSWORD: str = 'admin123'
+    MAIN_DATABASE_MYSQL_PASSWORD: str = 'admin123'
     MAIN_DATABASE_MYSQL_HOST: str = 'localhost'
     MAIN_DATABASE_MYSQL_PORT: str = '3306'
     MAIN_DATABASE_MYSQL_DATABASE_NAME: str = 'agd'
@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     def get_main_database_mysql_url(self) -> str:
         return 'mysql+mysqlconnector://{}:{}@{}:{}/{}'.format(
             self.MAIN_DATABASE_MYSQL_USER,
-            self.MAIN_DATABSAE_MYSQL_PASSWORD,
+            self.MAIN_DATABASE_MYSQL_PASSWORD,
             self.MAIN_DATABASE_MYSQL_HOST,
             self.MAIN_DATABASE_MYSQL_PORT,
             self.MAIN_DATABASE_MYSQL_DATABASE_NAME
