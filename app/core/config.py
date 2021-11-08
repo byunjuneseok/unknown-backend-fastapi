@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     MAIN_DATABASE_MYSQL_PORT: str = '3306'
     MAIN_DATABASE_MYSQL_DATABASE_NAME: str = 'agd'
 
+    ELASTICSEARCH_URL: str = 'localhost'
+    ELASTICSEARCH_PORT: str = '9200'
+    ELASTICSEARCH_STORE_SEARCH_INDEX: str = 'store_search'
+
     DYNAMODB_CURATION_COLLABORATIVE_FILTERING_CACHE_TABLE_NAME: str
     DYNAMODB_CURATION_COLLABORATIVE_FILTERING_CACHE_REGION: str = 'ap-northeast-2'
     DYNAMODB_CURATION_CONTENT_BASED_FILTERING_CACHE_TABLE_NAME: str
@@ -47,6 +51,13 @@ class Settings(BaseSettings):
             self.MAIN_DATABASE_MYSQL_HOST,
             self.MAIN_DATABASE_MYSQL_PORT,
             self.MAIN_DATABASE_MYSQL_DATABASE_NAME
+        )
+    
+    @property
+    def get_elasticsearch_url(self) -> str:
+        return '{}:{}'.format(
+            self.ELASTICSEARCH_URL,
+            self.ELASTICSEARCH_PORT
         )
 
     @property
