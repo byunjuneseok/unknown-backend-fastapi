@@ -1,6 +1,6 @@
 # recsys-backend-fastapi
 
-[![Lint](https://github.com/project-agd/recsys-backend-fastapi/actions/workflows/flake8.yml/badge.svg)](https://github.com/project-agd/recsys-backend-fastapi/actions/workflows/flake8.yml)
+![Architecture](static/architecture-diagram.png)
 
 # How to play.
 ```shell
